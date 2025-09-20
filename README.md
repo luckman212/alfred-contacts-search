@@ -1,4 +1,4 @@
-![](./icon.png)
+![](./icon_s.png)
 
 ## Contacts Search
 
