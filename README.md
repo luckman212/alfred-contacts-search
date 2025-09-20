@@ -1,3 +1,5 @@
+![](./icon.png)
+
 ## Contacts Search
 
 This is an Alfred Workflow that searches and opens Contacts by directly querying the SQLite3 databases on the system.
