@@ -20,6 +20,7 @@ SELECT
     r.ZORGANIZATION,
     r.ZJOBTITLE,
     r.ZUNIQUEID,
+    r.ZMODIFICATIONDATE,
     i.ZSTRINGFORINDEXING
 FROM
     ZABCDRECORD r
@@ -37,6 +38,7 @@ jq \
     --null-input \
     --compact-output \
     --arg dbname "$ADBK_DB" \
+    --arg sortby "$SORT_BY" \
     --argjson ct ${CACHE_SECS:-10} '
 
     def join_nonempty(sep):
@@ -74,6 +76,7 @@ jq \
                     .match = .ZSTRINGFORINDEXING |
                     {
                         uid: .ZUNIQUEID,
+                        mod: .ZMODIFICATIONDATE,
                         match: .match,
                         title: .title,
                         arg: .filename,
@@ -85,7 +88,12 @@ jq \
                         action: { text: .title },
                         quicklookurl: .filename
                     }
-                ) | sort_by(.title // "<No name>" | trim_i | ascii_downcase)
+                ) |
+                if $sortby == "date" then
+                    sort_by(-.mod)
+                else
+                    sort_by(.title // "<No name>" | trim_i | ascii_downcase)
+                end                
             else
                 [{ title: "No contacts found", valid: false }]
             end
