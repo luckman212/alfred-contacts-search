@@ -43,6 +43,8 @@ jq \
         map(select(.)) | join(sep);
     def join_nonempty:
         join_nonempty(" ");
+    def trim_i:
+        sub("^\\s+";"") | sub("\\s+$";"");
 
     [inputs] | reduce .[] as $item ([]; . + $item) |
 
@@ -83,7 +85,7 @@ jq \
                         action: { text: .title },
                         quicklookurl: .filename
                     }
-                ) | sort_by(.title | trim | ascii_downcase)
+                ) | sort_by(.title | trim_i | ascii_downcase)
             else
                 [{ title: "No contacts found", valid: false }]
             end
