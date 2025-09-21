@@ -85,7 +85,7 @@ jq \
                         action: { text: .title },
                         quicklookurl: .filename
                     }
-                ) | sort_by(.title | trim_i | ascii_downcase)
+                ) | sort_by(.title // "<No name>" | trim_i | ascii_downcase)
             else
                 [{ title: "No contacts found", valid: false }]
             end
