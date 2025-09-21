@@ -72,7 +72,7 @@ jq \
 	--argjson ct ${CACHE_SECS:-60} '
 
 	def join_nonempty(sep):
-		map(select(.)) | join(sep);
+		map(select(length > 0)) | join(sep);
 	def join_nonempty:
 		join_nonempty(" ");
 	def trim_i:
@@ -87,7 +87,7 @@ jq \
 			if length > 0 then
 				map(
 					.name = ([ .ZFIRSTNAME, .ZMIDDLENAME, .ZLASTNAME ] | join_nonempty) |
-					if .ZJOBTITLE then
+					if (.ZJOBTITLE | length > 0) then
 						if (.name | length > 0) then
 							.name += " (\(.ZJOBTITLE))"
 						else
