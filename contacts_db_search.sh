@@ -52,11 +52,17 @@ while read -r DB ; do
 		r.ZJOBTITLE,
 		r.ZUNIQUEID,
 		r.ZMODIFICATIONDATE,
-		i.ZSTRINGFORINDEXING
+		i.ZSTRINGFORINDEXING,
+		n.ZTEXT as ZNOTES,
+		JSON_GROUP_ARRAY(e.ZADDRESSNORMALIZED) AS EMAIL_ADDRESSES
 	FROM
 		ZABCDRECORD r
 	LEFT JOIN
 		ZABCDCONTACTINDEX i ON i.ZCONTACT = r.Z_PK
+	LEFT JOIN
+		ZABCDEMAILADDRESS e ON e.ZOWNER = r.Z_PK
+	LEFT JOIN
+		ZABCDNOTE n ON n.ZCONTACT = r.Z_PK
 	WHERE
 		r.ZCONTACTINDEX IS NOT NULL
 	GROUP BY
@@ -71,12 +77,21 @@ jq \
 	--arg sortby "$SORT_BY" \
 	--argjson ct ${CACHE_SECS:-60} '
 
-	def join_nonempty(sep):
-		map(select(length > 0)) | join(sep);
+	def join_nonempty($sep):
+		if type == "array" then
+			map(select(. != null) | tostring | select(trim | length > 0)) | join($sep)
+		else . end;
 	def join_nonempty:
 		join_nonempty(" ");
 	def trim_i:
 		sub("^\\s+";"") | sub("\\s+$";"");
+	def first_of($default):
+		first(.[] | select(type == "string" and . != "" and . != null)) // $default;
+	def domains:
+		if type == "string" then [.] else . end |
+		map(select(type=="string") |
+		scan("@.*\\..*";"n")) |
+		join(" ");
 
 	[inputs] | reduce .[] as $item ([]; . + $item) |
 
@@ -87,25 +102,15 @@ jq \
 			if length > 0 then
 				map(
 					.name = ([ .ZFIRSTNAME, .ZMIDDLENAME, .ZLASTNAME ] | join_nonempty) |
-					if (.ZJOBTITLE | length > 0) then
-						if (.name | length > 0) then
-							.name += " (\(.ZJOBTITLE))"
-						else
-							.name = .ZJOBTITLE
-						end
-					end |
-					if (.name | length > 0) then
-						.title = ([ .name, .ZORGANIZATION ] | join_nonempty(" - ")) |
-						.type = "person"
-					else
-						.title = .ZORGANIZATION |
-						.type = "org"
-					end |
+					if (.name | length > 0) then .type = "person" else .type = "org" end |
 					.filename = "\(.DBPATH)/Metadata/\(.ZUNIQUEID).abcdp" |
+					.email_arr = (.EMAIL_ADDRESSES | fromjson) |
+					.title = ([ ([ .name, .ZORGANIZATION ] | join_nonempty(" - ")), (.email_arr | join(", ")) ] | first_of("<No name>")) |
+					if (env.INCLUDE_NOTES? != "1") then .ZNOTES = null end |
 					{
 						uid: .ZUNIQUEID,
 						mod: .ZMODIFICATIONDATE,
-						match: .ZSTRINGFORINDEXING,
+						match: ([ .name, .ZORGANIZATION, .ZJOBTITLE, .ZNOTES, (.email_arr | domains), .ZSTRINGFORINDEXING ] | join_nonempty),
 						title: .title,
 						arg: .filename,
 						icon: { path: "\(.type).png" },
@@ -120,7 +125,7 @@ jq \
 				if $sortby == "date" then
 					sort_by(-.mod)
 				else
-					sort_by(.title // "<No name>" | trim_i | ascii_downcase)
+					sort_by(.title | trim_i | ascii_downcase)
 				end
 			else
 				[{ title: "No contacts found", valid: false }]

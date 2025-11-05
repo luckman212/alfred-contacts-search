@@ -17,9 +17,10 @@ fi
 
 if [[ ! -x $bin ]] || [[ $alfred_workflow_version != "$VERSION" ]]; then
 	_dbg "compiling $bin binary"
-	osascript <<-EOS
-	display notification "The $alfred_workflow_name workflow uses a helper program to interface with the clipboard history. This only occurs once, when a new workflow version is installed." with title "Compiling Swift binary"
-	EOS
+	#osascript <<-EOS
+	#display notification "The $alfred_workflow_name workflow uses a helper program to interface with the clipboard history. This only occurs once, when a new workflow version is installed." with title "Compiling Swift binary"
+	#EOS
+	./notificator --message "The $alfred_workflow_name workflow uses a helper program to interface with the clipboard history. This only occurs once, when a new workflow version is installed." --title "Compiling Swift binary"
 	swiftc -O -o $bin{,.swift}
 	echo $alfred_workflow_version > $sentinel
 	_dbg "set sentinel @ v${alfred_workflow_version}"

@@ -14,6 +14,8 @@ It also works around a limitation imposed by macOS 26 (“Tahoe”) where Spotli
 - QuickLook works! Press and release the <kbd>⇧SHIFT</kbd> key from Alfred’s result list to preview a contact card.
 - Hold the <kbd>⌘COMMAND</kbd> key while actioning a contact to reveal that contact’s .abcdp file in Finder.
 - Hold the <kbd>⌥OPTION</kbd> key while actioning a contact to open the contact in the native Contacts.app.
+- To search for contacts with a specific email domain (e.g. perhaps who all work for the same company) you can type `@corp.foo`
+- As of v1.5, **notes** are also included in the search (can be turned off in the Workflow Configuration if desired)
 
 ### Narrowing Scope
 
@@ -23,11 +25,12 @@ Additionally, you can choose specific GUIDs to exclude, by adding them to the **
 
 These features can be combined so Alfred returns only the results you desire.
 
-### Contact Actions (new in 1.4)
+### Contact Actions
 
-The workflow now includes a couple of [Contact Action Triggers](https://www.alfredapp.com/help/workflows/triggers/contact-action/). The first one is called “Populate clipboard history with individual address fields”. Ever needed to copy/paste a bunch of address fields one by one into a website? (street, city/town, postal code, etc). Usually when copying the entire address, it becomes a fiddly process of pasting, hitting backspace, or selecting little bits with the mouse and trying to get everything into the right place.
+The workflow includes a couple of [Contact Action Triggers](https://www.alfredapp.com/help/workflows/triggers/contact-action/). The first one is called “Populate clipboard history with individual address fields”. Ever needed to copy/paste a bunch of address fields one by one into a website? (street, city/town, postal code, etc). Usually when copying the entire address, it becomes a fiddly process of pasting, hitting backspace, or selecting little bits with the mouse and trying to get everything into the right place.
 
-If you enable this under Fetures → Contacts (screenshots below), you can <kbd>⌥OPTION</kbd> + <kbd>↩ENTER</kbd> on an Address field in the contact viewer to pop open a Text View. Position each bit of info on its own line, and then press _any_ modifier (<kbd>⌥OPT</kbd>, <kbd>⌘CMD</kbd>, <kbd>⇧SHIFT</kbd>) + <kbd>↩ENTER</kbd> again—the bits will be populated into Alfred’s clipboard history. Once there, you can activate Alfred’s clipboard history to paste the individual items wherever they’re needed.
+If you enable this under Fetures → Contacts (screenshots below), you can <kbd>⌥OPTION</kbd> + <kbd>↩ENTER</kbd> on an Address field in the contact viewer to pop open a Text View. Position each bit of info on its own line, and then press _any_ modifier (<kbd>⌥OPT</kbd>, <kbd>⌘CMD</kbd>, <kbd>⇧SHIFT</kbd>) + <kbd>↩ENTER</kbd> again—the bits will be populated into Alfred’s clipboard history. Once there, you can activate Alfred’s clipboard history or e.g. something like the [Sequential Paste](https://alfred.app/workflows/vitor/sequential-paste/) workflow to paste the individual items wherever they’re needed.
+
 
 The second one is called “Send Message” and, as you might suspect, if you action it on a phone number, it will start (or continue) an SMS/iMessage converstaion in Messages.app with that person.
 
@@ -40,6 +43,8 @@ The second one is called “Send Message” and, as you might suspect, if you ac
 ### Credits
 
 Thanks to [FireFingers21](https://www.alfredforum.com/topic/16269-contacts-search-only-with-keyword/page/2/#findComment-122641) for inspiration and the excellent SQL query that was adapted for use here.
+
+Thank you @vitorgalvao for [notificator](https://github.com/vitorgalvao/notificator).
 
 ### Requirements
 
