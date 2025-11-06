@@ -3,7 +3,7 @@
 # thanks @FireFingers21 for inspiration
 # https://www.alfredforum.com/topic/16269-contacts-search-only-with-keyword/page/2/#findComment-122641
 
-# requires jq: brew install jq
+# may require jq to be installed if you're on macOS < 15: brew install jq
 
 _dbg() {
 	(( DEBUG == 1 )) || return 0
@@ -77,14 +77,15 @@ jq \
 	--arg sortby "$SORT_BY" \
 	--argjson ct ${CACHE_SECS:-60} '
 
+	# trim func not included until jq 1.8
+	def trim_i:
+		sub("^\\s+";"") | sub("\\s+$";"");
 	def join_nonempty($sep):
 		if type == "array" then
-			map(select(. != null) | tostring | select(trim | length > 0)) | join($sep)
+			map(select(. != null) | tostring | select(trim_i | length > 0)) | join($sep)
 		else . end;
 	def join_nonempty:
 		join_nonempty(" ");
-	def trim_i:
-		sub("^\\s+";"") | sub("\\s+$";"");
 	def first_of($default):
 		first(.[] | select(type == "string" and . != "" and . != null)) // $default;
 	def domains:
